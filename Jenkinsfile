@@ -2,46 +2,50 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS' // Ensure this matches the name you used in Global Tool Configuration
-    }
-
-    environment {
-        CI = 'true' // Common environment variable for CI tools
+        nodejs 'NodeJS' // Name of your NodeJS installation in Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Pulls code from GitHub
-                git url: 'https://github.com/your-github-username/your-repo-name.git', branch: 'main'
+                // Checkout the code from GitHub
+                git url: 'https://github.com/your-repo/your-project.git', branch: 'main'
             }
         }
+
         stage('Install Dependencies') {
             steps {
-                // Installs Node.js dependencies
+                // Install Node.js dependencies
                 sh 'npm install'
             }
         }
-        stage('Build') {
+
+        stage('Build with Maven') {
             steps {
-                // Build the application
-                sh 'npm run build'
+                // Build the application using Maven
+                sh 'mvn clean package'
             }
         }
-        stage('Test') {
+
+        stage('Run Selenium Tests') {
             steps {
-                // Run application tests (assuming tests are defined in package.json)
-                sh 'npm test'
+                // Run Selenium tests (this assumes you have a script for running your tests)
+                // You may need to adjust this command based on your test setup
+                sh 'mvn test -Dtest=YourSeleniumTestClass'
             }
         }
     }
 
     post {
         success {
-            echo 'Build and tests completed successfully!'
+            echo 'Build and tests were successful!'
         }
         failure {
-            echo 'Build or tests failed. Please check the logs for details.'
+            echo 'Build or tests failed!'
+        }
+        always {
+            // Clean up or send notifications
+            echo 'Cleaning up...'
         }
     }
 }
