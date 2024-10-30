@@ -1,19 +1,47 @@
 pipeline {
-agent any
-tools {
-nodejs &#39;NodeJS&#39; // Name of your NodeJS installation in Jenkins
-}
-stages {
-stage(&#39;Checkout&#39;) {
-steps {
-// Checkout the code from GitHub
-git url: &#39;https://github.com/your-repo/your-project.git&#39;,
-branch: &#39;main&#39;
-}
-}
-stage(&#39;Install Dependencies&#39;) {
-steps {
-// Install Node.js dependencies
-sh &#39;npm install&#39;
-}
+    agent any
+
+    tools {
+        nodejs 'NodeJS' // Ensure this matches the name you used in Global Tool Configuration
+    }
+
+    environment {
+        CI = 'true' // Common environment variable for CI tools
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Pulls code from GitHub
+                git url: 'https://github.com/your-github-username/your-repo-name.git', branch: 'main'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                // Installs Node.js dependencies
+                sh 'npm install'
+            }
+        }
+        stage('Build') {
+            steps {
+                // Build the application
+                sh 'npm run build'
+            }
+        }
+        stage('Test') {
+            steps {
+                // Run application tests (assuming tests are defined in package.json)
+                sh 'npm test'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and tests completed successfully!'
+        }
+        failure {
+            echo 'Build or tests failed. Please check the logs for details.'
+        }
+    }
 }
