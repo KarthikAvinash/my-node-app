@@ -2,50 +2,46 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS' // Name of your NodeJS installation in Jenkins
+        nodejs 'NodeJS' // Ensure this matches the name you used in Global Tool Configuration
+    }
+
+    environment {
+        CI = 'true' // Common environment variable for CI tools
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from GitHub
-                git url: 'https://github.com/your-repo/your-project.git', branch: 'main'
+                // Pulls code from GitHub
+                git url: 'https://github.com/your-github-username/your-repo-name.git', branch: 'main'
             }
         }
-
         stage('Install Dependencies') {
             steps {
-                // Install Node.js dependencies
+                // Installs Node.js dependencies
                 sh 'npm install'
             }
         }
-
-        stage('Build with Maven') {
+        stage('Build') {
             steps {
-                // Build the application using Maven
-                sh 'mvn clean package'
+                // Build the application
+                sh 'npm run build'
             }
         }
-
-        stage('Run Selenium Tests') {
+        stage('Test') {
             steps {
-                // Run Selenium tests (this assumes you have a script for running your tests)
-                // You may need to adjust this command based on your test setup
-                sh 'mvn test -Dtest=YourSeleniumTestClass'
+                // Run application tests (assuming tests are defined in package.json)
+                sh 'npm test'
             }
         }
     }
 
     post {
         success {
-            echo 'Build and tests were successful!'
+            echo 'Build and tests completed successfully!'
         }
         failure {
-            echo 'Build or tests failed!'
-        }
-        always {
-            // Clean up or send notifications
-            echo 'Cleaning up...'
+            echo 'Build or tests failed. Please check the logs for details.'
         }
     }
 }
